@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+       #map-canvas { 
+        height: 600px; 
+        padding: 10px;
+        width: 90%;
+        margin: 0 auto;
+        text-align:center;
+        border: 10px white;
+      }
+         #map-canvas2 { 
+        height: 600px; 
+        padding: 10px;
+        width: 90%;
+        margin: 0 auto;
+        text-align:center;
+        border: 10px white;
+      }
+      #map-canvas3 { 
+        height: 600px; 
+        padding: 10px;
+        width: 90%;
+        margin: 0 auto;
+        text-align:center;
+        border: 10px white;
+      }
+      #outer {
+        height: 2100px;
+        width: 1200px;
+        border: 20px solid navy;
+        padding: 10px;
+        text-align: center;
+      }
+      #divider{
+        width: 100%;
+        height: 40px;
+        background-color: black;
+        margin: 0px;
+        text-align:center;
+        padding: 5px;
+
+      }
+      #divider h3{
+        color:white;
+      }
+      body {
+        background-color: #C2E0FF;
+      }
+      input {
+      	width: 120px;
+      	height: 40px;
+      	font-size: 20px;
+      }
+      #outer img{
+        width: 600px;
+        height: 500px;
+        margin: auto;
+        float; right;
+  /*      width: 50%;*/
+      }
+      #notification {
+        padding: 0px;
+        vertical-align: middle;
+      }
+      #year {
+      	position: absolute;
+      	top: 166px;
+  		left: 880px;
+  		font-size: 30px;
+  		font-family: sans-serif;
+ 	 	color: black;
+
+      }
+      #year2 {
+      	position: absolute;
+      	top: 850px;
+  		left: 880px;
+  		font-size: 30px;
+  		font-family: sans-serif;
+ 	 	color: black;
+
+      }
+      #year3 {
+      	position: absolute;
+      	top: 1550px;
+  		left: 880px;
+  		font-size: 30px;
+  		font-family: sans-serif;
+ 	 	color: black;
+
+      }
+    
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1cfkI2IcGQGERTIn-AKXXeEy83mix6KY&libraries=geometry,visualization&sensor=false">
+    </script>
+
+    <script type="text/javascript" src="depData.js"></script>
+    <script type="text/javascript" src="timeSeriesData.js"></script>
+    <script type="text/javascript">
+      
+    var data5 = [];
+    var data6 = [];
+    var data7 = [];
+
+      function initialize() 
+      {
+        var mapOptions = {
+          center: { lat: 28.892, lng: -40.315484},
+          zoom: 3
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+        var map2 = new google.maps.Map(document.getElementById('map-canvas2'),mapOptions);
+        var map3 = new google.maps.Map(document.getElementById('map-canvas3'),mapOptions);
+
+      //google.maps.event.addListener(map, 'tilesloaded', addData(data5));
+      document.getElementById("button1").onclick =  function() {
+      	addData(DepTimeSeries, data5, heatmap, 1535, "year"); 
+      };
+      document.getElementById("button2"). onclick = function() {
+      	addData(PurchaseTimeSeries, data6, heatmap2, 1526, "year2");
+
+      };
+        document.getElementById("button3"). onclick = function() {
+      	addData(SaleTimeSeries, data7, heatmap3, 1526, "year3");
+
+      };
+        
+      heatmap = new google.maps.visualization.HeatmapLayer({data: data5});
+      heatmap.setMap(map);
+      heatmap.set("radius", 50);
+      heatmap.set("maxIntensity", 3500);
+
+      function addData(arr, arg, arg2, yr, id)
+      {
+      	if(arg.length == 27335 || arg.length == 17318 || arg.length == 18776)
+      	{
+      		arg = [];
+      		arg2.setData(arg);
+      	}
+      	for( j = 0; j < arr.length; j++)
+      	{
+      		if(arr[j].year < yr)
+      		{
+      			//do nothing
+      		}
+      		else if( arr[j].year > yr + 10) // we have printed 50 years.
+      		{
+      			setTimeout(function() { addData(arr, arg, arg2, (yr+ 10), id ); }, 1200);
+      			break;
+      		}
+      		else
+      		{
+      			arg.push(new google.maps.LatLng(arr[j].lat, arr[j].lon) );
+      			document.getElementById(id).innerHTML = arr[j].year;
+      		}
+      	}
+
+      	arg2.setData(arg);
+      	console.log("done");
+      }
+
+
+
+      heatmap2 = new google.maps.visualization.HeatmapLayer({data: data6});
+      heatmap2.setMap(map2);
+      heatmap2.set("radius", 50);
+      heatmap2.set("maxIntensity", 2000);
+
+      heatmap3 = new google.maps.visualization.HeatmapLayer({data: data7});
+      heatmap3.setMap(map3);
+      heatmap3.set("radius", 50);
+      heatmap3.set("maxIntensity", 2000);
+      }
+
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+
+  
+    </script>
+  </head>
+  <body>
+  <b style="text-align:center; font-size: 50px;"> Trans-Atlantic Slave Trade Visualization  </b>
+    <div id="outer">
+    <div id="divider"> <h3> Cumulative Frequency of Slave Voyage Port of Departure</h3> </div>
+    <input id="button1" type="button" value="Animate"  />
+    <div id="map-canvas"></div>
+    <div id="year"> Before 1535 </div>
+    <div id="divider"> <h3> Cumulative Frequency of Principal Port of Slave Purchase</h3> </div>
+    <input id="button2" type="button" value="Animate"  />
+    <div id="map-canvas2"></div>
+    <div id="year2"> Before 1526</div>
+    <div id="divider"> <h3> Cumulative Frequency of Principal Port of Slave Sale</h3> </div>
+    <input id="button3" type="button" value="Animate"  />
+    <div id="map-canvas3"></div>
+    <div id="year3"> Before 1526</div>
+
+
+    </div>
+    
+
+</html>
