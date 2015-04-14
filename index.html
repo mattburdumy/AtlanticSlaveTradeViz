@@ -132,7 +132,8 @@ For further technical information about this project, please contact Professor A
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
-                    <h3>All Data Gathered from  <a href="http://www.slavevoyages.org/tast/index.faces">The Trans-Atlantic Slave Trade Database </a> </h3>
+                    <h3>All Data Gathered from  <a href="http://www.slavevoyages.org/tast/index.faces">The Trans-Atlantic Slave Trade Database </a>, 
+                    <br />overall estimates can be found <a href="http://www.slavevoyages.org/tast/assessment/estimates.faces"> here </a>  </h3>
                 </div>
             </div>
         </div>
@@ -146,6 +147,7 @@ For further technical information about this project, please contact Professor A
                     <h2>Cumulative Frequency of Slave Voyage Port of Departure</h2>
                     <p class="lead">This map shows where Atlantic slaving voyages originated.</p>
                       <input id="button1" type="button" value="Animate"  />
+                      <input id="pause1" type="button" value="Pause"  />
                       <div id= "year" style="font-size: 30px; font-family: sans-serif; color: black;"> Before 1535 </div>
                 </div>
             </div>
@@ -176,6 +178,7 @@ For further technical information about this project, please contact Professor A
                     <h2>Cumulative Frequency of Principal Port of Slave Purchase</h2>
                     <p class="lead">This map shows where Atlantic slavers purchased captive Africans.</p>
                       <input id="button2" type="button" value="Animate"  />
+                      <input id="pause2" type="button" value="Pause"  />
                       <div id= "year2" style="font-size: 30px; font-family: sans-serif; color: black;" > Before 1526 </div>
                 </div>
             </div>
@@ -204,6 +207,7 @@ For further technical information about this project, please contact Professor A
                     <h2>Cumulative Frequency of Principal Port of Slave Sale</h2>
                     <p class="lead">This map shows where Atlantic slavers disembarked their human cargoes.</p>
                       <input id="button3" type="button" value="Animate"  />
+                      <input id="pause3" type="button" value="Pause"  />
                       <div id= "year3" style="font-size: 30px; font-family: sans-serif; color: black;"> Before 1526 </div>
                 </div>
             </div>
@@ -292,6 +296,13 @@ For further technical information about this project, please contact Professor A
     var data5 = [];
     var data6 = [];
     var data7 = [];
+    var pause1 = false;
+    var pause2 = false;
+    var pause3 = false;
+    var BASE_YR_1 = 1535;
+    var BASE_YR_2 = 1526;
+    var BASE_YR_3 = 1526;
+
 
       function initialize() 
       {
@@ -303,52 +314,160 @@ For further technical information about this project, please contact Professor A
         var map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
         var map2 = new google.maps.Map(document.getElementById('map-canvas2'),mapOptions);
         var map3 = new google.maps.Map(document.getElementById('map-canvas3'),mapOptions);
+        document.getElementById("pause1").disabled = true;
+        document.getElementById("pause2").disabled = true;
+        document.getElementById("pause3").disabled = true;
 
       //google.maps.event.addListener(map, 'tilesloaded', addData(data5));
       document.getElementById("button1").onclick =  function() {
-        addData(DepTimeSeries, data5, heatmap, 1535, "year"); 
-      };
-      document.getElementById("button2"). onclick = function() {
-        addData(PurchaseTimeSeries, data6, heatmap2, 1526, "year2");
+        document.getElementById("button1").disabled = true;
+        document.getElementById("pause1").disabled = false;
+        addData(DepTimeSeries, data5, heatmap, 1535, "year", 1);
 
       };
-        document.getElementById("button3"). onclick = function() {
-        addData(SaleTimeSeries, data7, heatmap3, 1526, "year3");
+      document.getElementById("button2").onclick = function() {
 
+      	document.getElementById("button2").disabled = true;
+      	document.getElementById("pause2").disabled = false;
+        addData(PurchaseTimeSeries, data6, heatmap2, 1526, "year2", 2);
+
+      };
+        document.getElementById("button3").onclick = function() {
+
+        document.getElementById("button3").disabled = true;
+        document.getElementById("pause3").disabled = false;
+        addData(SaleTimeSeries, data7, heatmap3, 1526, "year3", 3);
+
+      };
+
+      document.getElementById("pause1").onclick = function() {
+      	if(pause1) // is paused
+      	{
+      		pause1 = false;
+      		document.getElementById("pause1").value = "Pause";
+      		addData(DepTimeSeries, data5, heatmap, document.getElementById("year").innerHTML, "year", 1);
+      	}
+      	else // was running
+      	{
+      		pause1 = true;
+      		document.getElementById("pause1").value = "Continue";
+
+      	}
+      };
+
+      document.getElementById("pause2").onclick = function() {
+      	if(pause2) // is paused
+      	{
+      		pause2 = false;
+      		document.getElementById("pause2").value = "Pause";
+      		addData(PurchaseTimeSeries, data6, heatmap2, document.getElementById("year2").innerHTML, "year2", 2);
+      	}
+      	else // was running
+      	{
+      		pause2 = true;
+      		document.getElementById("pause2").value = "Continue";
+
+      	}
+      };
+
+      document.getElementById("pause3").onclick = function() {
+      	if(pause3) // is paused
+      	{
+      		pause3 = false;
+      		document.getElementById("pause3").value = "Pause";
+      		addData(SaleTimeSeries, data7, heatmap3, document.getElementById("year3").innerHTML, "year3", 3);
+      	}
+      	else // was running
+      	{
+      		pause3 = true;
+      		document.getElementById("pause3").value = "Continue";
+
+      	}
       };
         
+
       heatmap = new google.maps.visualization.HeatmapLayer({data: data5});
       heatmap.setMap(map);
       heatmap.set("radius", 50);
       heatmap.set("maxIntensity", 3500);
 
-      function addData(arr, arg, arg2, yr, id)
+      function addData(arr, arg, arg2, yr, id, num)
       {
-        if(arg.length == 27335 || arg.length == 17318 || arg.length == 18776)
+      	if(pause1 && num == 1)
+      	{
+      		return;
+      	}
+      	if(pause2 && num == 2)
+      	{
+      		return;
+      	}
+      	if(pause3 && num == 3)
+      	{
+      		return;
+      	}
+
+        if( (arg.length >= 27335 && num == 1) || (arg.length >= 17318 && num == 2) ||  (arg.length >= 18776 && num == 3) ) // reset map.
         {
-            arg = [];
+            arg.length = 0;
             arg2.setData(arg);
+            if(num == 1)
+            {
+            	document.getElementById("button1").disabled = true;
+            	document.getElementById(id).innerHTML = BASE_YR_1;
+            }
+            if(num == 2)
+            {
+            	document.getElementById("button1").disabled = true;
+            	document.getElementById(id).innerHTML = BASE_YR_2;
+            }
+            if(num == 3)
+            {
+            	document.getElementById("button1").disabled = true;
+            	document.getElementById(id).innerHTML = BASE_YR_3;
+            }
         }
         for( j = 0; j < arr.length; j++)
         {
-            if(arr[j].year < yr)
+            if(arr[j].year < parseInt(yr))
             {
                 //do nothing
             }
-            else if( arr[j].year > yr + 10) // we have printed 50 years.
+            else if( arr[j].year > parseInt(yr) + 10) // we have printed 50 years.
             {
-                setTimeout(function() { addData(arr, arg, arg2, (yr+ 10), id ); }, 900);
-                break;
+               setTimeout(function() { addData(arr, arg, arg2, (parseInt(yr)+ 10), id, num); }, 900);
+               break;
             }
             else
             {
-                arg.push(new google.maps.LatLng(arr[j].lat, arr[j].lon) );
+               arg.push(new google.maps.LatLng(arr[j].lat, arr[j].lon) );
                document.getElementById(id).innerHTML = arr[j].year;
             }
         }
 
         arg2.setData(arg);
-        console.log("done");
+
+        if( (arg.length >= 27335 && num == 1) || (arg.length >= 17318 && num == 2) ||  (arg.length >= 18776 && num == 3) ) // reset map.
+        {
+
+            if(num == 1)
+            {
+            	document.getElementById("button1").disabled = false;
+            	document.getElementById("pause1").disabled = true;
+            	return;
+            }
+            if(num == 2)
+            {
+            	document.getElementById("button2").disabled = false;
+            	document.getElementById("pause2").disabled = true;
+            	return;
+            }
+            if(num == 3)
+            {
+            	document.getElementById("button3").disabled = false;
+            	document.getElementById("pause3").disabled = true;
+            	return;
+            }
+        }
       }
 
 
@@ -367,8 +486,6 @@ For further technical information about this project, please contact Professor A
 
       google.maps.event.addDomListener(window, 'load', initialize);
 
-
-  
     </script>
 
 </html>
